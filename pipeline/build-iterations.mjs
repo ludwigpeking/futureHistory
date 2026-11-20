@@ -327,8 +327,9 @@ const iterations = runs.map(function (run) {
   const endingId = 'ending_' + run.ending;
   nodeOf(endingId, function () { return { kind: 'ending', label: splitLabel(ENDINGS[run.ending].label, 14), note: ENDINGS[run.ending].text, finale: ENDINGS[run.ending].finale }; }).uses++;
   const terminalRecord = run.events.find(function (eventRecord) { return eventRecord.eventId === run.ending; });
-  const endingEdges = terminalRecord && terminalRecord.drivers.length ? causeEdge(terminalRecord.drivers[0].tech, endingId) : [];
-  steps.push({ kind: 'ending', nodeId: endingId, year: run.endYear, edges: endingEdges, marks: terminalRecord && terminalRecord.drivers.length ? [techMark(terminalRecord.drivers[0].tech)] : [] });
+  const endingStepId = endingId + '@end';
+  const endingEdges = terminalRecord && terminalRecord.drivers.length ? causeEdge(terminalRecord.drivers[0].tech, endingStepId) : [];
+  steps.push({ kind: 'ending', nodeId: endingStepId, year: run.endYear, edges: endingEdges, marks: terminalRecord && terminalRecord.drivers.length ? [techMark(terminalRecord.drivers[0].tech)] : [] });
   return {
     seed: run.seed, policyId: run.policyId, policyLabel: POLICY_LABELS[run.policyId], rerollIndex: run.rerollIndex, ending: run.ending, endYear: run.endYear,
     startingTechs: startingTechs, steps: steps,

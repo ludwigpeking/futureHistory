@@ -153,6 +153,7 @@
     createSvgElement("line", { x1: 70, y1: FORK_PIXELS - 40, x2: WORLD_WIDTH - 70, y2: FORK_PIXELS - 40, stroke: RED_COLOR, "stroke-width": "1.2", "stroke-dasharray": "2 6" }, layers.axes);
     addText(layers.axes, story.forkYear + " · " + story.protagonist.name.toUpperCase() + " CHOOSES", Object.assign({ x: 90, y: FORK_PIXELS - 52 }, sectionFont), true);
     createSvgElement("line", { x1: 70, y1: ENDING_ROW_PIXELS - 60, x2: WORLD_WIDTH - 70, y2: ENDING_ROW_PIXELS - 60, stroke: INK_COLOR, "stroke-width": "1", "stroke-dasharray": "1 6" }, layers.axes);
+    addText(layers.axes, "ENDINGS SO FAR", Object.assign({ x: 90, y: ENDING_ROW_PIXELS - 72 }, sectionFont), true);
   }
   var bandGroup = null;
   function buildBand(layers) {
@@ -222,7 +223,8 @@
       var eventLast = (labelLines.length - 1) * EVENT_LINE_PIXELS;
       var eventMark = buildMarkText(group, eventLast + 17, mark.when, mark.actor);
       var halfEvent = Math.max(widestEvent, eventMark.getComputedTextLength()) / 2;
-      extents = { left: -halfEvent, right: halfEvent, top: -15, bottom: eventLast + 20, inY: -16, outY: eventLast + 21 };
+      // The left side keeps room for the NEW tag, so it never runs into a neighbour.
+      extents = { left: -halfEvent - 42, right: halfEvent, top: -15, bottom: eventLast + 20, inY: -16, outY: eventLast + 21 };
       group.newTag = addText(group, "NEW", { x: -halfEvent - 8, y: 0, "text-anchor": "end", "font-family": FONT_FAMILY, "font-size": "11", "font-weight": "600", "letter-spacing": "1.5", fill: RED_COLOR }, true);
       group.newTag.style.display = "none";
     }
@@ -486,7 +488,7 @@
     var historyEdges = [];
     var seenEdges = {};
     allSteps.forEach(function (step) {
-      if (step.kind === "event") eventYears[step.nodeId] = step.year;
+      if (step.kind === "event" || step.kind === "ending") eventYears[step.nodeId] = step.year;
       (step.edges || []).forEach(function (edgeId) {
         if (seenEdges[edgeId]) return;
         seenEdges[edgeId] = true;
@@ -746,8 +748,10 @@
       var redPath = "";
       history.layout.edges.forEach(function (routedEdge) { if (routedEdge.kind === "decision") redPath += routedEdge.pathData + " "; else inkPath += routedEdge.pathData + " "; });
       var dotPath = "";
+      var endPath = "";
       Object.keys(history.layout.records).forEach(function (nodeId) {
         var record = history.layout.records[nodeId];
+        if (record.node.kind === "ending") endPath += "M" + (record.x - 4).toFixed(1) + " " + (record.y - 30).toFixed(1) + " h8 v8 h-8 Z ";
         if (record.node.kind !== "event") return;
         dotPath += "M" + (record.x - 2.6).toFixed(1) + " " + (record.y - 5).toFixed(1) + " a2.6 2.6 0 1 0 5.2 0 a2.6 2.6 0 1 0 -5.2 0 ";
       });
@@ -755,6 +759,7 @@
       createSvgElement("path", { d: inkPath, fill: "none", stroke: INK_COLOR, "stroke-width": "0.6", opacity: "0.028" }, group);
       if (redPath) createSvgElement("path", { d: redPath, fill: "none", stroke: RED_COLOR, "stroke-width": "0.8", "stroke-dasharray": "6 5", opacity: "0.04" }, group);
       createSvgElement("path", { d: dotPath, fill: INK_COLOR, opacity: "0.09" }, group);
+      createSvgElement("path", { d: endPath, fill: RED_COLOR, opacity: "0.35" }, group);
       group.style.display = "none";
       traceElements[history.index] = group;
     })();
@@ -907,6 +912,7 @@
       if (kind === "decision" || kind === "ending") {
         opacity = isPrologue && !overviewMode ? 0.25 : 0.42;
         if (history && history.appear[nodeId] !== undefined && localBeat >= history.appear[nodeId]) opacity = Math.max(opacity, Math.min(1, (localBeat - history.appear[nodeId]) / fadeBeats));
+        if (kind === "ending" && endingReached && history.iteration.ending === record.node.endingKey) opacity = 1;
       } else if (isPrologue && !overviewMode) {
         var appearAt = prologueSpan.appear[nodeId];
         opacity = appearAt !== undefined && localBeat >= appearAt ? Math.min(1, (localBeat - appearAt) / fadeBeats) : 0;
@@ -980,7 +986,7 @@
     }
 
     // The cursor runs along the year being told; on this sheet that is exactly where the event sits.
-    var showCursor = !overviewMode && (step.kind === "event" || step.kind === "decision" || step.kind === "tech");
+    var showCursor = !overviewMode && (step.kind === "event" || step.kind === "decision" || step.kind === "tech" || step.kind === "ending");
     cursorLine.style.display = showCursor ? "" : "none";
     cursorLabel.style.display = showCursor ? "" : "none";
     if (showCursor) {
