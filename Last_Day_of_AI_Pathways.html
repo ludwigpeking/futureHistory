@@ -138,7 +138,7 @@ body.ui-hidden .corner-button:hover, body.ui-hidden .corner-button:focus-visible
     <button type="button" id="previous-button">Previous history</button>
     <button type="button" id="next-button">Next history</button>
     <div class="scrub"><input type="range" id="scrubber" min="0" max="10000" value="0" aria-label="Position across all histories"></div>
-    <label class="pace" for="pace">Pace <input type="range" id="pace" min="0.2" max="6" step="0.1" value="1.2"><output id="pace-value" for="pace"></output></label>
+    <label class="pace" for="pace">Pace <input type="range" id="pace" min="0.2" max="6" step="0.1" value="0.8"><output id="pace-value" for="pace"></output></label>
     <div class="clock" id="clock"></div>
   </div>
 </div>
@@ -1160,7 +1160,7 @@ window.storyData = {"prologue":{"futureStartYear":2027,"techs":[{"id":"tech_real
   }
 
   // ── Rendering one moment ──────────────────────────────────────────────────
-  var eventsPerSecond = 1.2;
+  var eventsPerSecond = 0.8;
   var overviewMode = true;
   var divergenceMark = null;
   var cursorLine = null;

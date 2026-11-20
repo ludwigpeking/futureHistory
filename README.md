@@ -46,7 +46,7 @@ The sheet fills the window. The title, the endings tally, the caption and the tr
 - Play / Pause (Space), Previous history, Next history.
 - **Sound on / Sound off** (top right, or the M key). Sounds are synthesised in the browser (`sound.js`, Web Audio, no files) and play only while the sequence plays forward. Pitch follows the horizontal position on the sheet, on a pentatonic scale from left to right, so a cluster keeps its register. Technologies ring as small bells; events knock like a marimba, with an added fifth when the event is new and a low tritone where a history diverges; China's decision is a low drum; each ending has its own chord (Great Collapse with a rumble, the fall of the government sliding down). Browsers start audio only after a click, so sound begins with Play.
 - The scrubber covers the real past and all 115 histories; Previous from the first history goes back to the real past.
-- **Pace** sets steps per second (0.2–6, default 1.2). A technology takes half a step. The camera centres on each emerging event or technology.
+- **Pace** sets steps per second (0.2–6, default 0.8). A technology takes half a step. The camera centres on each emerging event or technology.
 - Hovering a name while paused explains it: for the real past, what happened; for a technology, what it builds on.
 - `?at=0.31` in the URL opens at that fraction of the loop (used by the QA screenshots).
 
