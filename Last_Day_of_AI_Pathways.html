@@ -496,24 +496,24 @@ window.storyData = {"prologue":{"futureStartYear":2027,"techs":[{"id":"tech_real
   function drawAxes(layers) {
     var axisFont = { "text-anchor": "middle", "font-family": FONT_FAMILY, "font-weight": "500", "font-size": "19", fill: "#b8463b" };
     function yearLabel(year, text) {
-      addText(layers.axes, text || String(year), Object.assign({ x: 36, y: yearToPixels(year) + 6 }, axisFont));
-      addText(layers.axes, text || String(year), Object.assign({ x: WORLD_WIDTH - 36, y: yearToPixels(year) + 6 }, axisFont));
+      addText(layers.yearLabels, text || String(year), Object.assign({ x: 36, y: yearToPixels(year) + 6 }, axisFont), true);
+      addText(layers.yearLabels, text || String(year), Object.assign({ x: WORLD_WIDTH - 36, y: yearToPixels(year) + 6 }, axisFont), true);
     }
     for (var prologueYear = PROLOGUE_FIRST_YEAR; prologueYear < FUTURE_START_YEAR; prologueYear += 1) yearLabel(prologueYear);
     yearLabel(FUTURE_START_YEAR);
     for (var futureYear = 2030; futureYear <= 2085; futureYear += 5) yearLabel(futureYear);
     var headFont = { "text-anchor": "middle", "font-family": FONT_FAMILY, "font-size": "15", "letter-spacing": "4", fill: "#6d6553" };
-    addText(layers.axes, "TECHNOLOGIES IN ARCS, EVENTS BELOW  ·  FINE ARROWS: WHAT A TECHNOLOGY BUILDS ON  ·  IN RED: WHO REACHED IT FIRST, WHERE AN EVENT FIRED", Object.assign({ x: WORLD_WIDTH / 2, y: headerTopPixels }, headFont));
+    addText(layers.yearLabels, "TECHNOLOGIES IN ARCS, EVENTS BELOW  ·  FINE ARROWS: WHAT A TECHNOLOGY BUILDS ON  ·  IN RED: WHO REACHED IT FIRST, WHERE AN EVENT FIRED", Object.assign({ x: WORLD_WIDTH / 2, y: headerTopPixels }, headFont));
     var sectionFont = { "font-family": FONT_FAMILY, "font-size": "15", "font-weight": "600", "letter-spacing": "3", fill: RED_COLOR };
-    addText(layers.axes, "THE REAL PAST", Object.assign({ x: 90, y: headerTopPixels + 50 }, sectionFont), true);
+    addText(layers.yearLabels, "THE REAL PAST", Object.assign({ x: 90, y: headerTopPixels + 50 }, sectionFont), true);
     // The 2027 line: where the real past ends and the simulated futures begin.
     createSvgElement("line", { x1: 70, y1: PROLOGUE_BOTTOM_PIXELS - 20, x2: WORLD_WIDTH - 70, y2: PROLOGUE_BOTTOM_PIXELS - 20, stroke: RED_COLOR, "stroke-width": "1.6" }, layers.axes);
-    addText(layers.axes, FUTURE_START_YEAR + " · THE SIMULATED FUTURES BEGIN", Object.assign({ x: 90, y: PROLOGUE_BOTTOM_PIXELS - 32 }, sectionFont), true);
-    addText(layers.axes, "THE GAME'S STARTING CONDITIONS: TECHNOLOGIES HELD AT THE START", Object.assign({ x: 90, y: PROLOGUE_BOTTOM_PIXELS + 8 }, sectionFont, { "font-size": "12", "font-weight": "500", fill: "#8a5a50" }), true);
+    addText(layers.yearLabels, FUTURE_START_YEAR + " · THE SIMULATED FUTURES BEGIN", Object.assign({ x: 90, y: PROLOGUE_BOTTOM_PIXELS - 32 }, sectionFont), true);
+    addText(layers.yearLabels, "THE GAME'S STARTING CONDITIONS: TECHNOLOGIES HELD AT THE START", Object.assign({ x: 90, y: PROLOGUE_BOTTOM_PIXELS + 8 }, sectionFont, { "font-size": "12", "font-weight": "500", fill: "#8a5a50" }), true);
     createSvgElement("line", { x1: 70, y1: FORK_PIXELS - 40, x2: WORLD_WIDTH - 70, y2: FORK_PIXELS - 40, stroke: RED_COLOR, "stroke-width": "1.2", "stroke-dasharray": "2 6" }, layers.axes);
-    addText(layers.axes, story.forkYear + " · " + story.protagonist.name.toUpperCase() + " CHOOSES", Object.assign({ x: 90, y: FORK_PIXELS - 52 }, sectionFont), true);
+    addText(layers.yearLabels, story.forkYear + " · " + story.protagonist.name.toUpperCase() + " CHOOSES", Object.assign({ x: 90, y: FORK_PIXELS - 52 }, sectionFont), true);
     createSvgElement("line", { x1: 70, y1: ENDING_ROW_PIXELS - 60, x2: WORLD_WIDTH - 70, y2: ENDING_ROW_PIXELS - 60, stroke: INK_COLOR, "stroke-width": "1", "stroke-dasharray": "1 6" }, layers.axes);
-    addText(layers.axes, "ENDINGS SO FAR", Object.assign({ x: 90, y: ENDING_ROW_PIXELS - 72 }, sectionFont), true);
+    addText(layers.yearLabels, "ENDINGS SO FAR", Object.assign({ x: 90, y: ENDING_ROW_PIXELS - 72 }, sectionFont), true);
   }
   var bandGroup = null;
   function buildBand(layers) {
@@ -1519,7 +1519,7 @@ window.storyData = {"prologue":{"futureStartYear":2027,"techs":[{"id":"tech_real
 
   function start() {
     while (stageElement.lastChild && stageElement.lastChild.nodeName !== "title") stageElement.removeChild(stageElement.lastChild);
-    ["paper", "axes", "traces", "cursor", "staticLineage", "staticEdges", "liveEdges", "staticBackings", "liveBackings", "staticNodes", "liveNodes", "marks", "measure"].forEach(function (layerName) {
+    ["paper", "axes", "traces", "cursor", "staticLineage", "staticEdges", "liveEdges", "staticBackings", "liveBackings", "staticNodes", "liveNodes", "marks", "yearLabels", "measure"].forEach(function (layerName) {
       layers[layerName] = createSvgElement("g", { "class": "layer-" + layerName }, stageElement);
     });
     layers.measure.setAttribute("opacity", "0");
@@ -1530,7 +1530,9 @@ window.storyData = {"prologue":{"futureStartYear":2027,"techs":[{"id":"tech_real
     buildBand(layers);
     Object.keys(staticRecords).forEach(function (nodeId) { attachHover(staticRecords[nodeId].group, staticRecords[nodeId].node, staticRecords[nodeId].mark); });
     cursorLine = createSvgElement("line", { stroke: RED_COLOR, "stroke-width": "1.6", opacity: "0.55" }, layers.cursor);
-    cursorLabel = addText(layers.cursor, "", { "text-anchor": "end", "font-family": FONT_FAMILY, "font-size": "20", "font-weight": "600", fill: RED_COLOR, "letter-spacing": "1.5" }, true);
+    // Year labels sit above every node, on a paper halo, so text never hides them.
+    cursorLabel = addText(layers.yearLabels, "", { "text-anchor": "end", "font-family": FONT_FAMILY, "font-size": "20", "font-weight": "600", fill: RED_COLOR, "letter-spacing": "1.5" }, true);
+    cursorLabel.setAttribute("stroke-width", "7");
     divergenceMark = createSvgElement("g", {}, layers.marks);
     createSvgElement("path", { d: "M-7 -6 L7 -6 L0 3 Z", fill: RED_COLOR }, divergenceMark);
     addText(divergenceMark, "HISTORY DIVERGES HERE", { x: 0, y: -12, "text-anchor": "middle", "font-family": FONT_FAMILY, "font-size": "13", "font-weight": "600", "letter-spacing": "2", fill: RED_COLOR }, true);
