@@ -1,0 +1,92 @@
+/* Layout: the sheet fills the window under a moving camera; the title, the tally, the caption and the
+   transport float over it as catalogue labels and can all be hidden at once. */
+:root {
+  --wall: #c5c7c1;
+  --paper: #d9d2c2;
+  --panel: rgba(217, 210, 194, 0.93);
+  --panel-rule: rgba(27, 26, 23, 0.22);
+  --ink: #1b1a17;
+  --ink-muted: #4a463d;
+  --barr-red: #c42f26;
+  --focus: #b02a22;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --font-display: "Oswald", "Arial Narrow", sans-serif;
+  --font-chart: "Jost", "Futura", "Century Gothic", sans-serif;
+}
+/* The sheet is paper in both themes, so the panels stay paper and ink; only the surround darkens. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --wall: #141513; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --wall: #141513; color-scheme: dark; }
+
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { background: var(--wall); color: var(--ink); font-family: var(--font-chart); font-size: 15px; line-height: 1.5; }
+
+#stage { position: fixed; inset: 0; display: block; width: 100vw; height: 100vh; height: 100dvh; background: var(--paper); }
+
+/* Floating panels. */
+.floating { position: fixed; z-index: 2; transition: opacity 0.25s ease, visibility 0.25s; }
+body.ui-hidden .floating { opacity: 0; visibility: hidden; }
+.masthead, .tally-card, .caption-card, .transport {
+  background: var(--panel); border: 1px solid var(--panel-rule); color: var(--ink);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.45);
+}
+
+.masthead { top: 16px; left: var(--gutter); width: min(460px, calc(100vw - 2 * var(--gutter) - 150px)); padding: 12px 16px 10px; display: grid; gap: 4px; }
+.masthead h1 { font-family: var(--font-display); font-weight: 600; text-transform: uppercase; font-size: clamp(22px, 3vw, 32px); line-height: 1; margin: 0; letter-spacing: 0.01em; }
+.masthead p { margin: 0; color: var(--ink-muted); font-size: 13px; line-height: 1.4; }
+.about summary { cursor: pointer; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--barr-red); font-weight: 500; }
+.about .footnote { margin-top: 6px; font-size: 12px; }
+
+.corner-controls { position: fixed; z-index: 3; top: 16px; right: var(--gutter); display: flex; gap: 8px; }
+.corner-button {
+  font: inherit; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink);
+  background: var(--panel); border: 1px solid var(--panel-rule); padding: 7px 12px; cursor: pointer;
+}
+body.ui-hidden .corner-button { opacity: 0.55; }
+body.ui-hidden .corner-button:hover, body.ui-hidden .corner-button:focus-visible { opacity: 1; }
+
+.tally-card { right: var(--gutter); top: 62px; padding: 10px 12px; display: grid; gap: 4px; font-size: 12px; pointer-events: none; min-width: 210px; }
+.tally-card .tally-title { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--barr-red); font-weight: 500; }
+.tally-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; font-variant-numeric: tabular-nums; }
+.tally-row .bar { height: 5px; background: var(--ink); margin-top: 2px; }
+.tally-row.current { color: var(--barr-red); font-weight: 600; }
+.tally-row.current .bar { background: var(--barr-red); }
+
+/* Caption above the transport, both at the foot of the window. The stack itself lets the sheet take the mouse. */
+.bottom-stack { left: var(--gutter); right: var(--gutter); bottom: max(16px, env(safe-area-inset-bottom, 0px)); display: grid; gap: 10px; justify-items: start; pointer-events: none; }
+.caption-card { width: min(420px, 100%); box-sizing: border-box; padding: 12px 14px 13px; display: grid; gap: 3px; pointer-events: none; }
+.caption-card .kicker { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--barr-red); font-weight: 500; }
+.caption-card .headline { font-family: var(--font-display); font-weight: 500; font-size: 21px; line-height: 1.1; text-transform: uppercase; text-wrap: balance; }
+.caption-card .body { font-size: 13.5px; line-height: 1.45; }
+.caption-card .meta { font-size: 12px; color: var(--ink-muted); line-height: 1.4; }
+
+.transport { pointer-events: auto; justify-self: stretch; box-sizing: border-box; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.transport button {
+  font: inherit; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink);
+  background: transparent; border: 1px solid var(--panel-rule); padding: 6px 11px; cursor: pointer;
+}
+.transport .scrub { flex: 1 1 220px; min-width: 0; }
+.transport input[type="range"] { width: 100%; accent-color: var(--barr-red); }
+.transport .pace { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.transport .pace input { width: 120px; }
+.transport .pace output { min-width: 82px; font-variant-numeric: tabular-nums; }
+.transport .clock { font-family: var(--font-display); font-size: 18px; font-variant-numeric: tabular-nums; min-width: 180px; text-align: right; }
+
+.play-overlay { position: fixed; inset: 0; z-index: 1; display: grid; place-items: center; background: rgba(217, 210, 194, 0.3); }
+.play-overlay button {
+  font-family: var(--font-display); font-size: 22px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
+  color: #e3dccb; background: var(--barr-red); border: 0; padding: 14px 26px; cursor: pointer; box-shadow: 0 10px 30px -12px rgba(0,0,0,0.5);
+}
+.play-overlay button:focus-visible, .transport button:focus-visible, .transport input:focus-visible, .corner-button:focus-visible, .about summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+@media (max-width: 760px) {
+  .masthead { width: calc(100vw - 2 * var(--gutter) - 130px); }
+  .masthead p#masthead-text { display: none; }
+  .tally-card { display: none; }
+  .caption-card .body { display: none; }
+  .transport .pace input { width: 90px; }
+  .transport .clock { min-width: 0; text-align: left; }
+}

@@ -1,0 +1,6 @@
+# Headless-browser profile and screenshots from qa/screenshots.cjs
+qa/shots/
+# Raw simulation outputs; regenerate with the pipeline (see README)
+pipeline/output/
+node_modules/
+.DS_Store
