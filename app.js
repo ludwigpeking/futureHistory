@@ -800,7 +800,7 @@
   }
 
   // ── Rendering one moment ──────────────────────────────────────────────────
-  var eventsPerSecond = 0.8;
+  var eventsPerSecond = 0.5;
   var overviewMode = true;
   var divergenceMark = null;
   var cursorLine = null;
